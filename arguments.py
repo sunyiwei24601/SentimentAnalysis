@@ -40,4 +40,10 @@ parser.add_argument(
             For evaluating/analyzing/server choose between barissayil/bert-sentiment-analysis-sst and paths to the models you have trained previously.""",
 )
 
+parser.add_argument(
+    "-i",
+    type=str,
+    default=None
+)
+
 args = parser.parse_args()

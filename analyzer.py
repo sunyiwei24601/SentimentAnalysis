@@ -137,6 +137,7 @@ class Analyzer:
             positive_logit = self.model(
                 input_ids=input_ids, attention_mask=attention_mask
             )
+            # print(positive_logit)
             # Convert the logit to a probability.
             positive_probability = torch.sigmoid(positive_logit.unsqueeze(-1)).item()
             # Convert the probability to a percentage.
@@ -147,4 +148,29 @@ class Analyzer:
             if is_positive:
                 return "Positive", int(positive_percentage)
             else:
-                return "Negative", int(100 - positive_percentage)
+                return "Negative", int(positive_percentage)
+            
+    def classify_sentiment_batch(self, texts):
+        # Don't track gradient.
+        with torch.no_grad():
+            # Tokens are made up of CLS token, text converted to tokens, and SEP token.            
+            tokens = self.tokenizer.batch_encode_plus(texts, padding=True)
+            # Convert tokens to input IDs; convert them to tensor, unsqueeze, put it to device.
+            input_ids = (
+                torch.tensor(tokens.input_ids)
+                # .unsqueeze(0)
+                .to(self.device)
+            )
+            # Create attention mask from input IDs.
+            attention_mask = (input_ids != 0).long()
+            # Get logit (log-odds) of sentiment being positive from the model.
+            positive_logit = self.model(
+                input_ids=input_ids, attention_mask=attention_mask
+            )
+            # print(positive_logit)
+            # Convert the logit to a probability.
+            positive_probability = torch.sigmoid(positive_logit.unsqueeze(-1))
+            # Convert the probability to a percentage.
+            
+            positive_probability = positive_probability.detach().numpy().flatten() * 2 -1
+            return positive_probability
