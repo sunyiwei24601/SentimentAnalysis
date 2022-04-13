@@ -15,7 +15,7 @@ if __name__ == "__main__":
                                 charset='utf8mb4',
                                 cursorclass=pymysql.cursors.DictCursor)    
     
-    for i in range(100000, 1000000, 100):
+    for i in range(911500, 2000000, 100):
         cur = conn.cursor()
         start_id = i;
         end_id = i + 100;
@@ -28,8 +28,8 @@ if __name__ == "__main__":
             title = row['title']
             content = row['content']
             sentence = title + " " + content
-            texts.append(sentence[:512])
-            sentiment, percentage = analyzer.classify_sentiment(sentence[:512])
+            texts.append(sentence[:200])
+            sentiment, percentage = analyzer.classify_sentiment(sentence[:200])
             
             
             cur.execute(f'update REDDIT_DATA SET sentiment_score={percentage/100 * 2 - 1} where id={id}')
